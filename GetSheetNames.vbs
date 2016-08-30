@@ -3,7 +3,11 @@ Option Explicit
 Const sourceFolder = "C:\in\"
 Const resultFolder = "C:\out\"
 
-MsgBox Join(ListXlsInFolder(sourceFolder), vbCrLf)
+Dim sheets : sheets = GetSheetNames(ListXlsInFolder(sourceFolder), sourceFolder)
+Dim i
+For i = 0 To UBound(sheets)
+  MsgBox sheets(i)(0) & ": " & vbCrLf & Join(sheets(i)(1), vbCrLf)
+Next
 
 ' ListXlsInFolder
 ' receives: pathname of a folder
@@ -40,5 +44,44 @@ Private Function FolderExists(ByVal folderPath)
   Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
   FolderExists = fso.FolderExists(folderPath)
   Set fso = Nothing
+
+End Function
+
+
+' GetSheetNames
+' receives: array with sheets names and pathname to folder
+' returns: ragged multidimensional array (array of arrays)
+Private Function GetSheetNames(sheetNames, path)
+
+  Dim app : Set app = CreateObject("Excel.Application")
+  app.DisplayAlerts = False
+
+  Dim allNames : allNames = Array()
+  Dim i, j
+  For i = 1 To UBound(sheetNames)
+
+    Dim wb : Set wb = app.Workbooks.Open(path & sheetNames(i), 0, True)
+    Dim k, l
+    Dim sheets : sheets = Array()
+    For k = 1 To wb.Sheets.Count
+      l = Ubound(sheets)
+      ReDim Preserve sheets(l + 1)
+      sheets(l + 1) = wb.Sheets(k).Name
+    Next
+
+    j = Ubound(allNames)
+    ReDim Preserve allNames(j + 1)
+    allNames(j + 1) = Array(sheetNames(i), sheets)
+
+    wb.Saved = True
+    wb.Close
+    Set wb = Nothing
+
+  Next
+
+  app.Quit
+  Set app = Nothing
+
+  getSheetNames = allNames
 
 End Function
