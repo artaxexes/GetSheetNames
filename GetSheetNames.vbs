@@ -133,5 +133,9 @@ End Function
 ' FileDelete
 ' receives: file path
 Private Sub FileDelete(filePath)
-  MsgBox "deleted"
+
+  Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
+  fso.DeleteFile(filePath)
+  Set fso = Nothing
+
 End Sub
