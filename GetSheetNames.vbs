@@ -3,11 +3,8 @@ Option Explicit
 Const sourceFolder = "C:\in\"
 Const resultFolder = "C:\out\"
 
-Dim sheets : sheets = GetSheetNames(ListXlsInFolder(sourceFolder), sourceFolder)
-Dim i
-For i = 0 To UBound(sheets)
-  MsgBox sheets(i)(0) & ": " & vbCrLf & Join(sheets(i)(1), vbCrLf)
-Next
+SaveSheetNames GetSheetNames(ListXlsInFolder(sourceFolder), sourceFolder), resultFolder
+
 
 ' ListXlsInFolder
 ' receives: pathname of a folder
@@ -85,3 +82,52 @@ Private Function GetSheetNames(sheetNames, path)
   getSheetNames = allNames
 
 End Function
+
+
+' SaveSheetNames
+' receives: ragged multidimensional array (array of arrays)
+Private Sub SaveSheetNames(allNames, path)
+
+    Dim app : Set app = CreateObject("Excel.Application")
+    app.DisplayAlerts = False
+
+    Dim wb : Set wb = app.Workbooks.Add
+    Dim ws : Set ws = wb.Worksheets(1)
+    app.Sheets(1).Select
+
+    Dim i, j, k
+    k = 1
+    For i = 0 To UBound(allNames)
+      For j = 0 To UBound(allNames(i)(1))
+        ws.Cells(k, 1).Value = allNames(i)(0)
+        ws.Cells(k, 2).Value = allNames(i)(1)(j)
+        'MsgBox allNames(i)(0) & ": " & allNames(i)(1)(j)
+        k = k + 1
+      Next
+    Next
+
+    path = path & "SheetNames.xlsx"
+    If FileExists(path) Then
+      FileDelete(path)
+    End If
+
+    wb.SaveAs(path)
+    wb.Close
+    Set wb = Nothing
+    Set ws = Nothing
+
+End Sub
+
+
+' FileExists
+' receives: pathname
+' returns: boolean
+Private Function FileExists(ByVal filePath)
+  FileExists = False
+End Function
+
+' FileDelete
+' receives: file path
+Private Sub FileDelete(filePath)
+  MsgBox "deleted"
+End Sub
