@@ -123,7 +123,11 @@ End Sub
 ' receives: pathname
 ' returns: boolean
 Private Function FileExists(ByVal filePath)
-  FileExists = False
+
+  Dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
+  FileExists = fso.FileExists(filePath)
+  Set fso = Nothing
+
 End Function
 
 ' FileDelete
